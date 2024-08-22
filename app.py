@@ -31,7 +31,7 @@ def mongo_item_to_json(item):
 @app.route("/", methods=["GET"])
 def list_manga():
     mangas = collection.find().limit(10)
-    return ([mongo_item_to_json(manga) for manga in mangas])
+    return jsonify([mongo_item_to_json(manga) for manga in mangas])
 
 
 
