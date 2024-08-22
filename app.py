@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from bson.errors import InvalidId
 import urllib.parse
 
+
 # Define MongoDB connection details
 raw_username = "darshakmainz"
 raw_password = "Darshak1310@"
@@ -30,7 +31,7 @@ def mongo_item_to_json(item):
 @app.route("/", methods=["GET"])
 def list_manga():
     mangas = collection.find().limit(10)
-    return jsonify([mongo_item_to_json(manga) for manga in mangas])
+    return ([mongo_item_to_json(manga) for manga in mangas])
 
 
 
