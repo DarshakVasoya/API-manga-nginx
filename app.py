@@ -1,43 +1,40 @@
+from flask import Flask, request, jsonify, abort
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
+import urllib.parse
 
-from flask import Flask,request, jsonify
-import json
+# Define MongoDB connection details
+raw_username = "darshakmainz"
+raw_password = "Darshak1310@"
+encoded_username = urllib.parse.quote_plus(raw_username)
+encoded_password = urllib.parse.quote_plus(raw_password)
+uri = f"mongodb+srv://{encoded_username}:{encoded_password}@manga.tu41ccq.mongodb.net/?retryWrites=true&w=majority"
 
-app=Flask(__name__)
+# Create a MongoDB client
+client = MongoClient(uri)
+database = client["manga"]
+collection = database["all_manga"]
 
+# Create Flask app
+app = Flask(__name__)
 
-# load the manga data from json file
-
-with open('Data/data.json','r') as file:
-    manga_data=json.load(file)
-
-@app.route('/',methods=['GET'])
-def get_all_manhua():
-    return jsonify(manga_data)
-
-@app.route('/<title>', methods=['GET'])
-def get_manhua_by_title(title):
-    for manga in manga_data:
-        if manga['title'].lower() == title.lower():
-            return jsonify(manga)
-    return jsonify({"error": "Manga not found"}), 404
+# Helper function to convert MongoDB documents to JSON-serializable format
+def mongo_item_to_json(item):
+    item["_id"] = str(item["_id"])
+    return item
 
 
-@app.route('/manga/<title>/chapters', methods=['GET'])
-def get_chapters(title):
-    for manga in manga_data:
-        if manga['title'].lower() == title.lower():
-            return jsonify(manga['chapters'])
-    return jsonify({"error": "Manga not found"}), 404
 
-@app.route('/manga/<title>/chapters/<chapter>', methods=['GET'])
-def get_chapter(title, chapter):
-    for manga in manga_data:
-        if manga['title'].lower() == title.lower():
-            if chapter in manga['chapters']:
-                return jsonify(manga['chapters'][chapter])
-            else:
-                return jsonify({"error": "Chapter not found"}), 404
-    return jsonify({"error": "Manga not found"}), 404
+# Get all Manga entries
+@app.route("/", methods=["GET"])
+def list_manga():
+    mangas = collection.find().limit(10)
+    return jsonify([mongo_item_to_json(manga) for manga in mangas])
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+
+
+# Run the Flask app
+if __name__ == "__main__":
+    # app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True,host='0.0.0.0')
