@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 import urllib.parse
+from flask_cors import CORS 
 
 
 # Define MongoDB connection details
@@ -19,6 +20,7 @@ collection = database["all_manga"]
 
 # Create Flask app
 app = Flask(__name__)
+CORS(app)
 
 # Helper function to convert MongoDB documents to JSON-serializable format
 def mongo_item_to_json(item):
