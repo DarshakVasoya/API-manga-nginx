@@ -32,7 +32,7 @@ def mongo_item_to_json(item):
 # Get all Manga entries
 @app.route("/", methods=["GET"])
 def list_manga():
-    mangas = collection.find().limit(10)
+    mangas = collection.find().limit(20)
     return jsonify([mongo_item_to_json(manga) for manga in mangas])
 
 
